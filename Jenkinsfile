@@ -21,7 +21,6 @@ pipeline {
             docker {
                   image 'pioro/dxtoolkit:2.4.8'
                   args '-u root -w /dxtoolkit -v ${PWD}:/config'
-                  label 'master'
             }
          }
          steps {
@@ -43,7 +42,6 @@ pipeline {
             docker {
                   image 'pioro/dxtoolkit:2.4.8'
                   args '-u root -w /dxtoolkit -v ${PWD}:/config'
-                  label 'master'
             }
          }
          steps {
