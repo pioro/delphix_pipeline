@@ -11,12 +11,20 @@ pipeline {
    }
     
    agent {
-      label 'master'
+      label 'oracle19'
    }
 
    stages {
 
       stage('Discover environment 0') {
+         agent {
+            docker {
+                  image 'pioro/dxtoolkit:2.4.8'
+                  args '-w /dxtoolkit -u root'
+                  label 'master'
+                  reuseNode true
+            }
+         }
          steps {
             engine()
          }
