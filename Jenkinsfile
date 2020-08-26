@@ -19,6 +19,7 @@ pipeline {
          agent {
             docker {
                   image 'pioro/dxtoolkit:2.4.8'
+                  args: '-u root -w /dxtoolkit'
                   label 'master'
             }
          }
