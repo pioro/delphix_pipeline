@@ -25,6 +25,7 @@ pipeline {
             script {
     	       engine() 
             }
+         }
       }
       stage('Discover environment') {
          steps {
