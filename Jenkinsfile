@@ -11,14 +11,18 @@ pipeline {
    }
     
    agent {
-       docker { 
-           image 'pioro/dxtoolkit:2.4.8' 
-           args '-w /dxtoolkit -u root'
-       }
+      label 'oracle19'
    }
 
    stages {
       stage('Create config and check engine') {
+         agent {
+            docker { 
+               image 'pioro/dxtoolkit:2.4.8' 
+               args '-w /dxtoolkit -u root'
+               reuseNode True
+            }
+         }
          steps {
             sh '/dxtoolkit/dx_config -convert todxconf -text hostname,$DLPX_ENGINE,80,$DLPX_USER,$DLPX_PASSWORD,true,http -configfile dxtools.conf'
             sh '/dxtoolkit/dx_get_appliance'
@@ -27,7 +31,26 @@ pipeline {
             }
          }
       }
+
+      stage('a nie docker') {
+         steps {
+            echo 'Hello World'
+            writeFile file: 'groovy1.txt', text: 'Working with files the Groovy way is easy.'
+            sh 'ls -l groovy1.txt'
+            sh 'cat groovy1.txt'
+            echo 'Hello World 2nd' 
+            sh "echo 'SLON 2' >> plik "
+         }
+      }
+
       stage('Discover environment') {
+         agent {
+            docker { 
+               image 'pioro/dxtoolkit:2.4.8' 
+               args '-w /dxtoolkit -u root'
+               reuseNode True
+            }
+         }
          steps {
              add_environment slon:"krowa"
          }
