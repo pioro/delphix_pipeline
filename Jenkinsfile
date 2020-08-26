@@ -29,9 +29,6 @@ pipeline {
       }
       stage('Discover environment') {
          steps {
-             script {
-                add_environment()
-             }
              add_environment slon:krowa
          }
       }
