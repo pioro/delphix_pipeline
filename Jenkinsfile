@@ -11,25 +11,24 @@ pipeline {
    }
     
    agent {
-      docker {
-            image 'pioro/dxtoolkit:2.4.8'
-            args '-w /dxtoolkit -u root'
-            label 'master'
-      }
+      label 'oracle19'
    }
 
    stages {
 
-      stage('Discover environment 0') {
+      stage('Configure Engine') {
+         agent {
+            docker {
+                  image 'pioro/dxtoolkit:2.4.8'
+                  label 'master'
+            }
+         }
          steps {
             engine()
          }
       }
 
       stage('a nie docker') {
-         agent {
-            label 'oracle19'
-         }
          steps {
             echo 'Hello World'
             sh 'ls -l '
@@ -39,9 +38,14 @@ pipeline {
       }
 
       stage('Discover environment') {
+         agent {
+            docker {
+                  image 'pioro/dxtoolkit:2.4.8'
+                  label 'master'
+            }
+         }
          steps {
-            echo 'Hello World'
-            sh 'ls -l '
+            add_environment name:"source"
          }
       }
       
