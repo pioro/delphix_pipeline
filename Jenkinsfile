@@ -35,8 +35,7 @@ pipeline {
          }
          steps {
             echo 'Hello World'
-            sh 'ls -l groovy1.txt'
-            sh 'cat groovy1.txt'
+            sh 'ls -l '
             echo 'Hello World 2nd' 
             sh "echo 'SLON 2' >> plik "
          }
