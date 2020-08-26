@@ -29,7 +29,7 @@ pipeline {
       }
       stage('Discover environment') {
          steps {
-            sh '/dxtoolkit/dx_create_env -envname "source" -envtype unix -host source -username "oracle" -authtype password -password oracle -toolkitdir "/home/oracle/toolkit" '
+             add_environment
          }
       }
       
