@@ -4,7 +4,7 @@ pipeline {
         DLPX_ENGINE = "myengine1"
         DLPX_USER = "admin"
         DLPX_PASSWORD = "delphix"
-        DXTOOLKIT_CONF = "/tmp/dxtools.conf"
+        DXTOOLKIT_CONF = "$WORKSPACE/dxtools.conf"
    }
     
    agent {
@@ -17,10 +17,8 @@ pipeline {
    stages {
       stage('Create config and check engine') {
          steps {
-            dir('/tmp') { 
-                sh '/dxtoolkit/dx_config -convert todxconf -text hostname,$DLPX_ENGINE,80,$DLPX_USER,$DLPX_PASSWORD,true,http -configfile dxtools.conf'
-                sh '/dxtoolkit/dx_get_appliance'
-            }
+            sh '/dxtoolkit/dx_config -convert todxconf -text hostname,$DLPX_ENGINE,80,$DLPX_USER,$DLPX_PASSWORD,true,http -configfile dxtools.conf'
+            sh '/dxtoolkit/dx_get_appliance'
          }
       }
       stage('Discover environment') {
