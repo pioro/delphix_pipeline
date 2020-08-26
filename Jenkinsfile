@@ -7,7 +7,6 @@ pipeline {
         DLPX_ENGINE = "myengine1"
         DLPX_USER = "admin"
         DLPX_PASSWORD = "delphix"
-        DXTOOLKIT_CONF = "$WORKSPACE/dxtools.conf"
    }
     
    agent {
@@ -23,6 +22,9 @@ pipeline {
                   args '-w /dxtoolkit -u root'
                   label 'master'
             }
+         }
+         environment {
+            DXTOOLKIT_CONF = "$WORKSPACE/dxtools.conf"
          }
          steps {
             engine()
