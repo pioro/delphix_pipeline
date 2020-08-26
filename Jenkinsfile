@@ -7,6 +7,7 @@ pipeline {
         DLPX_ENGINE = "myengine1"
         DLPX_USER = "admin"
         DLPX_PASSWORD = "delphix"
+        DXTOOLKIT_CONF = "/config/dxtools.conf"
    }
     
    agent {
@@ -21,6 +22,7 @@ pipeline {
                   image 'pioro/dxtoolkit:2.4.8'
                   args '-u root -w /dxtoolkit -v ${PWD}:/config'
                   label 'master'
+                  reuseNode true
             }
          }
          steps {
@@ -41,7 +43,9 @@ pipeline {
          agent {
             docker {
                   image 'pioro/dxtoolkit:2.4.8'
+                  args '-u root -w /dxtoolkit -v ${PWD}:/config'
                   label 'master'
+                  reuseNode true
             }
          }
          steps {
