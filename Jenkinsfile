@@ -20,7 +20,7 @@ pipeline {
             docker { 
                image 'pioro/dxtoolkit:2.4.8' 
                args '-w /dxtoolkit -u root'
-               reuseNode True
+               reuseNode true
             }
          }
          steps {
@@ -48,7 +48,7 @@ pipeline {
             docker { 
                image 'pioro/dxtoolkit:2.4.8' 
                args '-w /dxtoolkit -u root'
-               reuseNode True
+               reuseNode true
             }
          }
          steps {
