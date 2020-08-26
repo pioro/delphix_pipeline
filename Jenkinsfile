@@ -11,7 +11,7 @@ pipeline {
    }
     
    agent {
-      label 'oracle19'
+      label 'master'
    }
 
    stages {
@@ -33,6 +33,9 @@ pipeline {
       }
 
       stage('a nie docker') {
+         agent {
+            label 'oracle19'
+         }
          steps {
             echo 'Hello World'
             writeFile file: 'groovy1.txt', text: 'Working with files the Groovy way is easy.'
