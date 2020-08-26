@@ -7,7 +7,6 @@ pipeline {
         DLPX_ENGINE = "myengine1"
         DLPX_USER = "admin"
         DLPX_PASSWORD = "delphix"
-        DXTOOLKIT_CONF = "$WORKSPACE/dxtools.conf"
    }
     
    agent {
