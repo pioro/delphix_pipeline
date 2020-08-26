@@ -22,7 +22,6 @@ pipeline {
                   image 'pioro/dxtoolkit:2.4.8'
                   args '-w /dxtoolkit -u root'
                   label 'master'
-                  reuseNode true
             }
          }
          steps {
