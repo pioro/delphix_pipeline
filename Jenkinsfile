@@ -7,25 +7,20 @@ pipeline {
         DLPX_ENGINE = "myengine1"
         DLPX_USER = "admin"
         DLPX_PASSWORD = "delphix"
+        DXTOOLKIT_CONF = "$WORKSPACE/dxtools.conf"
    }
     
    agent {
-      label 'oracle19'
+      docker {
+            image 'pioro/dxtoolkit:2.4.8'
+            args '-w /dxtoolkit -u root'
+            label 'master'
+      }
    }
 
    stages {
 
       stage('Discover environment 0') {
-         agent {
-            docker {
-                  image 'pioro/dxtoolkit:2.4.8'
-                  args '-w /dxtoolkit -u root'
-                  label 'master'
-            }
-         }
-         environment {
-            DXTOOLKIT_CONF = "$WORKSPACE/dxtools.conf"
-         }
          steps {
             engine()
          }
