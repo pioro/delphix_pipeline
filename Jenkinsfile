@@ -18,8 +18,7 @@ pipeline {
 
       stage('Discover environment 0') {
          steps {
-            echo 'Hello World'
-            sh 'ls -l '
+            engine()
          }
       }
 
