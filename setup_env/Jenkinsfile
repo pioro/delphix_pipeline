@@ -1,5 +1,7 @@
-@Library('delphix_pipeline') _
-
+library identifier: 'delphix_pipeline@master', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: 'https://github.com/pioro/delphix_pipeline.git']
+)
 
 pipeline {
 
@@ -26,11 +28,19 @@ pipeline {
          }
       }
 
+
       stage('Discover environment') {
+             steps {
+                add_environment name:"source", host:"source", username:"oracle", password:"oracle"
+             }
+       }
+
+      stage('Add dsource') {
          steps {
-            add_environment name:"source", host:"source", user:"oracle", password:"oracle"
+            create_dsource dbname:"test19", env:"source"
          }
       }
       
    }
 }
+
