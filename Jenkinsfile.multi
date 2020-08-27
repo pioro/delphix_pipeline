@@ -29,7 +29,7 @@ pipeline {
          }
       }
 
-      stage('a nie docker') {
+      stage('This is on the Oracle host') {
          steps {
             echo 'Hello World'
             sh 'ls -l '

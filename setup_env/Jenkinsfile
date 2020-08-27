@@ -1,0 +1,36 @@
+@Library('delphix_pipeline') _
+
+
+pipeline {
+
+   environment { 
+        DLPX_ENGINE = "myengine1"
+        DLPX_USER = "admin"
+        DLPX_PASSWORD = "delphix"
+        DXTOOLKIT_CONF = "/config/dxtools.conf"
+   }
+    
+   agent {
+      docker {
+            image 'pioro/dxtoolkit:2.4.8'
+            args '-u root -w /dxtoolkit -v ${PWD}:/config'
+            reuseNode true
+      }
+   }
+
+   stages {
+
+      stage('Configure Engine') {
+         steps {
+            engine()
+         }
+      }
+
+      stage('Discover environment') {
+         steps {
+            add_environment name:"source", host:"source", user:"oracle", password:"oracle"
+         }
+      }
+      
+   }
+}
