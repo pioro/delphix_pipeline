@@ -1,0 +1,22 @@
+@Library('delphix_pipeline') import pioro.dct;
+def dctinst = new dct()
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+        stage('aaa') {
+            steps {
+                script {
+                    echo dctinst.get()
+                }
+            }
+        }
+    }
+}
