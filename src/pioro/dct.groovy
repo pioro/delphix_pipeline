@@ -14,7 +14,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
 
-
+class dct {
 
     def get() {
 
@@ -56,3 +56,4 @@ import java.security.cert.X509Certificate;
         }
 
     }
+}
