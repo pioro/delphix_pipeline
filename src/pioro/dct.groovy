@@ -16,7 +16,7 @@ import java.security.cert.X509Certificate;
 
 class dct {
 
-    
+    @NonCPS
     def get() {
 
         // Create a trust manager that does not validate certificate chains
@@ -41,6 +41,7 @@ class dct {
 
         // Create all-trusting host name verifier
         HostnameVerifier allHostsValid = new HostnameVerifier() {
+            @NonCPS
             public boolean verify(String hostname, SSLSession session) {
                 return true;
             }
