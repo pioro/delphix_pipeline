@@ -16,8 +16,7 @@ import java.security.cert.X509Certificate;
 
 class dct {
 
-    @NonCPS
-    def get() {
+    def setupSSL() {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = [ new X509TrustManager() {
@@ -49,6 +48,13 @@ class dct {
 
         // Install the all-trusting host verifier
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+    }
+
+    @NonCPS
+    def get() {
+
+        this.setupSSL()
 
         def get = new URL("https://uvo1bgogbnn1tfz3ifu.vm.cld.sr/v2/management/accounts").openConnection();
 
