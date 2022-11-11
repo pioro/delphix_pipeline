@@ -54,11 +54,16 @@ class dct {
 
         get.addRequestProperty("Authorization", "apk 36.tTNnxlYPZZtGupmYPKTEXJ3Rlt8UR1le6Z8ZKpxblD81SeVh9siwAOCLZUvIvJjM");
 
+        def outst
         def getRC = get.getResponseCode();
         println(getRC);
         if (getRC.equals(200)) {
-            println(get.getInputStream().getText());
+            outst = get.getInputStream().getText();
+        } else {
+            outst = "dupa"
         }
+
+        return outst
 
     }
 }
