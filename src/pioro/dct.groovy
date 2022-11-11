@@ -16,16 +16,19 @@ import java.security.cert.X509Certificate;
 
 class dct {
 
-    @NonCPS
+    
     def get() {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = [ new X509TrustManager() {
+                @NonCPS
                 public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
+                @NonCPS
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
+                @NonCPS
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }
