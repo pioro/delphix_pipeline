@@ -133,7 +133,7 @@ class dct {
         writer.close()
         String output;
         def getRC = conn.getResponseCode();
-        if (getRC.equals(201) or getRC.equals(200)) {
+        if (getRC.equals(201) || getRC.equals(200)) {
             output = conn.getInputStream().getText();
         } else {
             output = conn.getErrorStream().getText();
