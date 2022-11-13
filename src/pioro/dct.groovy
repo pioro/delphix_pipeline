@@ -173,14 +173,14 @@ class dct {
 
         def jsonSlurper = new JsonSlurper()
 
-        payload = """
+        String payload = """
         {
             "filter_expression": "name EQ '$name'"
         }
         """
 
-        ret_json = this.runPost('/v2/vdbs/search', payload);
-        ret_object = jsonSlurper.parseText(ret_json)
+        def ret_json = this.runPost('/v2/vdbs/search', payload);
+        def ret_object = jsonSlurper.parseText(ret_json)
 
         if (ret_object.response_metadata.total == 1) {
             println("mama baze")
@@ -193,7 +193,7 @@ class dct {
         ret_object = jsonSlurper.parseText(ret_json)
         println(ret_json)
 
-        job_stat = this.wait_for_job(ret_object.job.id)
+        def job_stat = this.wait_for_job(ret_object.job.id)
 
         if (job_stat.status.equals('COMPLETED')) {
             println("vdb created or refreshed")
