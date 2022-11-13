@@ -162,7 +162,7 @@ class dct {
 
     def create_or_refresh_vdb(String source, String name, String environment_name) {
 
-        vdb_obj = """
+        String vdb_obj = """
         {
             "source_data_id":"$source",
             "name":"$name",
