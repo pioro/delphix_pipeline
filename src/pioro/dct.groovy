@@ -84,26 +84,21 @@ class dct {
     }
 
 
-    def getnew() {
 
-        def get = new URL(this.dct_server).openConnection();
+    def runGET(String url) {
 
+        def get = new URL(this.dct_server + url).openConnection();
         get.addRequestProperty("Authorization", "apk " + this.dct_auth);
 
         def outst
         def getRC = get.getResponseCode();
-        println(getRC);
         if (getRC.equals(200)) {
             outst = get.getInputStream().getText();
         } else {
-            outst = "dupa";
+            throw new Exception("This is an in runGet. RC: " + getRC + " Error: " + get.getErrorStream().getText())
         }
 
-        return outst + " jestem nowy";
-
-    }
-
-    def runGET(String url) {
+        return outst;
 
     }
 
