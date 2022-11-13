@@ -85,6 +85,8 @@ class dct {
 
 
 
+
+
     def runGET(String url) {
 
         def get = new URL(this.dct_server + url).openConnection();
@@ -102,6 +104,10 @@ class dct {
 
     }
 
+
+    def getUsers() {
+        return this.runGet('/v2/management/accounts')
+    }
 
     def testerr() {
         throw new Exception("This is an error")
