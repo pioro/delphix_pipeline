@@ -14,7 +14,7 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
 import groovy.json.JsonSlurper 
-import groovy.json.JsonGenerator 
+
 
 class dct {
 
@@ -186,9 +186,6 @@ class dct {
             println("mama baze")
             ret_json = runPost("/v2/vdbs/$name/refresh_by_snapshot", '{}');
         } else {
-            def generator = new JsonGenerator.Options()
-                .excludeNulls()
-                .build()
             ret_json = this.runPost('/v2/vdbs/provision_by_snapshot', vdb_obj);
         }
 
