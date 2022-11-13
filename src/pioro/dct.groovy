@@ -97,7 +97,7 @@ class dct {
         if (getRC.equals(200)) {
             outst = get.getInputStream().getText();
         } else {
-            throw new Exception("This is an in runGet. RC: " + getRC + " Error: " + get.getErrorStream().getText())
+            throw new Exception("runGet Error. RC: " + getRC + " Error: " + get.getErrorStream().getText())
         }
 
         return outst;
@@ -109,8 +109,103 @@ class dct {
         return this.runGet('/v2/management/accounts')
     }
 
+
+    def createUser(String username, boolean admin) {
+        String payload = '{ "username": ' + username + ',"generate_api_key": true,"is_admin": true }';
+
+    }
+
     def testerr() {
         throw new Exception("This is an error")
     }
+
+
+    def runPost(String url, String payload) {
+        URL url = new URL(this.dct_server + url);
+        URLConnection conn = url.openConnection();
+        conn.setDoOutput(true);
+        conn.setRequestProperty ("Authorization", "apk " + this.dct_auth);
+        conn.addRequestProperty ("Content-Type", "application/json");
+        conn.addRequestProperty ("Accept", "application/json");
+        OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+        writer.write(payload);
+        writer.flush();
+        writer.close()
+        String output;
+        def getRC = conn.getResponseCode();
+        if (getRC.equals(201) or getRC.equals(200)) {
+            output = conn.getInputStream().getText();
+        } else {
+            output = conn.getErrorStream().getText();
+            throw new Exception("runPost Error. RC: " + getRC + " Error: " + output)  
+        }
+        return output
+    }
+
+
+    def wait_for_job(String job_id) {
+        boolean jobrunning = true
+        def jsonSlurper = new JsonSlurper();
+        def job_obj;
+        while(jobrunning) {
+            job_obj = jsonSlurper.parseText(runGet('/v2/jobs/' + job_id))
+            if ((job_obj.status.equals('RUNNING')) || (job_obj.status.equals('STARTED'))) {
+                sleep(10)
+            } else {
+                jobrunning = false;
+            }
+        }
+        return job_obj
+    }
+
+    def create_or_refresh_vdb(String source, String name, String environment_name) {
+
+        vdb_obj = """
+        {
+            "source_data_id":"$source",
+            "name":"$name",
+            "database_name":"$name",
+            "environment_id":"$environment_name"
+        }
+        """
+
+        def jsonSlurper = new JsonSlurper()
+
+        payload = """
+        {
+            "filter_expression": "name EQ '$name'"
+        }
+        """
+
+        ret_json = this.runPost('/v2/vdbs/search', payload);
+        ret_object = jsonSlurper.parseText(ret_json)
+
+        if (ret_object.response_metadata.total == 1) {
+            println("mama baze")
+            ret_json = runPost("/v2/vdbs/$name/refresh_by_snapshot", '{}');
+        } else {
+            def generator = new JsonGenerator.Options()
+                .excludeNulls()
+                .build()
+            ret_json = this.runPost('/v2/vdbs/provision_by_snapshot', vdb_obj);
+        }
+
+        
+        ret_object = jsonSlurper.parseText(ret_json)
+        println(ret_json)
+
+        job_stat = this.wait_for_job(ret_object.job.id)
+
+        if (job_stat.status.equals('COMPLETED')) {
+            println("vdb created or refreshed")
+        } else {
+            println("Error in job")
+            println(job_stat)
+            throw new Exception("create_or_refresh_vdb Error.  Error: " + job_stat)  
+        }
+
+
+    }
+
 
 }
