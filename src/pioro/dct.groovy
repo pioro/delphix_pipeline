@@ -73,4 +73,9 @@ class dct {
         return outst
 
     }
+
+    def testerr() {
+        throw new RunTimeException("This is an error")
+    }
+
 }
