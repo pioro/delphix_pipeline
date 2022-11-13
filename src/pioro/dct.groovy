@@ -16,6 +16,15 @@ import java.security.cert.X509Certificate;
 
 class dct {
 
+    String dct_server;
+    String dct_auth;
+
+    dct(dct_server, dct_auth) {
+        this.dct_server = dct_server;
+        this.dct_auth = dct_auth;
+        this.setupSSL();
+    }
+
     @NonCPS
     def setupSSL() {
 
@@ -73,6 +82,31 @@ class dct {
         return outst
 
     }
+
+
+    def getnew() {
+
+        def get = new URL(this.dct_server).openConnection();
+
+        get.addRequestProperty("Authorization", "apk " + this.dct_auth);
+
+        def outst
+        def getRC = get.getResponseCode();
+        println(getRC);
+        if (getRC.equals(200)) {
+            outst = get.getInputStream().getText();
+        } else {
+            outst = "dupa"
+        }
+
+        return outst
+
+    }
+
+    def runGET(String url) {
+
+    }
+
 
     def testerr() {
         throw new Exception("This is an error")
