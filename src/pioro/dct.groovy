@@ -87,7 +87,7 @@ class dct {
 
 
 
-    def runGET(String url) {
+    def runGet(String url) {
 
         def get = new URL(this.dct_server + url).openConnection();
         get.addRequestProperty("Authorization", "apk " + this.dct_auth);
