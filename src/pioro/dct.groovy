@@ -75,7 +75,7 @@ class dct {
     }
 
     def testerr() {
-        throw new RunTimeException("This is an error")
+        throw new Exception("This is an error")
     }
 
 }
