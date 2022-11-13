@@ -96,10 +96,10 @@ class dct {
         if (getRC.equals(200)) {
             outst = get.getInputStream().getText();
         } else {
-            outst = "dupa"
+            outst = "dupa";
         }
 
-        return outst
+        return outst + " jestem nowy";
 
     }
 
