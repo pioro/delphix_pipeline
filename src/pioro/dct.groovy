@@ -13,6 +13,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
+import groovy.json.JsonSlurper 
+import groovy.json.JsonGenerator 
 
 class dct {
 
@@ -121,8 +123,8 @@ class dct {
 
 
     def runPost(String url, String payload) {
-        URL url = new URL(this.dct_server + url);
-        URLConnection conn = url.openConnection();
+        URL urlobj = new URL(this.dct_server + url);
+        URLConnection conn = urlobj.openConnection();
         conn.setDoOutput(true);
         conn.setRequestProperty ("Authorization", "apk " + this.dct_auth);
         conn.addRequestProperty ("Content-Type", "application/json");
