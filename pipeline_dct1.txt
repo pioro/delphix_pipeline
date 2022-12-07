@@ -1,0 +1,27 @@
+@Library('delphix_pipeline') import pioro.dct;
+def dctinst = new dct('https://x.x.x.x','key')
+
+
+pipeline {
+    agent any
+
+    stages {
+        
+        
+        
+        stage('Checkout code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/piorotest/pipelinedemo.git'
+            }
+        }
+        stage('Prepare database') {
+            steps {
+                script {
+                    dctinst.create_or_refresh_vdb('db19','pipedb','marcintest')
+                }
+            }
+        }
+
+    }
+}
+
