@@ -101,6 +101,9 @@ pipeline {
             steps {
                 sh """        
                 /home/oracle/utPLSQL-cli/bin/utplsql run demo2/demo2@127.0.0.1/mydb_${BUILD_NUMBER}
+                export ORAENV_ASK=NO
+                export ORACLE_SID=pipedb
+                . oraenv
                 sqlplus demo2/demo2@localhost/mydb_${BUILD_NUMBER} << EOF
                 select count(*) from demo_customer
                 EOF
