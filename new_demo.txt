@@ -1,3 +1,5 @@
+@Library('delphix_pipeline') _
+
 pipeline {   
 
     agent {
@@ -45,14 +47,14 @@ pipeline {
 
         stage('Create DSource') {
             steps {
-                add_environment dbname:"db19", env:"singlenode"
+                create_dsource dbname:"db19", env:"singlenode"
             }
         }
 
 
         stage('Provision  VDBs') {
             steps {
-                prepare_vdb dbname: "golden_vdb", bookmarkname: "LATEST_SNAPSHOT"
+                prepare_vdb dbname: "gcvdb", bookmarkname: "LATEST_SNAPSHOT"
             }
         }
 
@@ -62,7 +64,7 @@ pipeline {
                 stage('Prepare 10pctdata') {
                     steps {
                         sh """
-                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/pipedb << EOF
+                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/gcvdb << EOF
                         create table demo_customer_new as select * from demo_customer sample(10);
                         drop table demo_customer;
                         rename demo_customer_new to demo_customer;
@@ -72,13 +74,13 @@ pipeline {
                 }
                 stage('Prepare 10pctdata datacatalog entry') {
                     steps {
-                        bookmark_db dbname: "golden_vdb", bookmarkname: "10pct"
+                        bookmark_db dbname: "gcvdb", bookmarkname: "10pct"
                     }
                 }
                 stage('Prepare 1pctdata') {
                     steps {
                         sh """
-                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/pipedb << EOF
+                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/gcvdb << EOF
                         create table demo_customer_new as select * from demo_customer sample(10);
                         drop table demo_customer;
                         rename demo_customer_new to demo_customer;
@@ -88,7 +90,7 @@ pipeline {
                 }
                 stage('Prepare 1pctdata datacatalog entry') {
                     steps {
-                        bookmark_db dbname: "golden_vdb", bookmarkname: "1pct"
+                        bookmark_db dbname: "gcvdb", bookmarkname: "1pct"
                     }
                 }
                 stage('Prepare syntetic') {
@@ -97,7 +99,7 @@ pipeline {
                     }
                     steps {
                         sh """
-                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/pipedb << EOF
+                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/gcvdb << EOF
                         truncate table demo_customer;
                         insert into demo_customer values (1, 'test sync 1', 'A', 'N');
                         insert into demo_customer values (2, 'test sync 2', 'A', 'N');
@@ -109,7 +111,7 @@ pipeline {
                 }
                 stage('Prepare syntetic datacatalog entry') {
                     steps {
-                        bookmark_db dbname: "golden_vdb", bookmarkname: "syntetic"
+                        bookmark_db dbname: "gcvdb", bookmarkname: "syntetic"
                     }
                 }
 

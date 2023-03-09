@@ -1,0 +1,123 @@
+@Library('delphix_pipeline') _
+
+def BOOKMARKNAME=''
+
+pipeline {
+
+   environment {
+        DLPX_ENGINE = "10.160.0.10"
+        DLPX_CRED = credentials('delphix_engine_credentials')
+        DLPX_USER = "$DLPX_CRED_USR"
+        DLPX_PASSWORD = "$DLPX_CRED_PSW"
+        DXTOOLKIT_CONF = "/config/dxtools.conf"
+   }
+
+   agent {
+       label 'oracle_target'
+   }
+   
+   stages {
+        stage('Checkout SCM') {
+            steps {
+                dir("$WORKSPACE/code") {
+                    checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/piorotest/pipelinedemo.git',
+                        credentialsId: '',
+                    ]]
+                    ])
+                }
+            }
+        }
+        
+      stage("config") {
+          steps {
+            script {
+                def testConfig = readJSON file: "$WORKSPACE/code/env.json"
+                sh "echo ${testConfig}"
+                BOOKMARKNAME = testConfig["bookmarkName"]
+                echo BOOKMARKNAME
+            }
+          }
+      }
+        
+
+                
+      stage('Configure Engine') {
+            steps {
+                engine()
+            }
+      }
+      
+
+      
+      stage('Prepare VDB') {
+            steps {
+                prepare_vdb dbname: "mydb_${BUILD_NUMBER}", bookmarkname: "${BOOKMARKNAME}"
+            }
+      }
+
+
+        stage('Install utPLSQL') {
+            steps {
+                sh """
+                export ORAENV_ASK=NO
+                export ORACLE_SID=pipedb
+                . oraenv
+                export ORACLE_SID=mydb_${BUILD_NUMBER}
+                cd /home/oracle/utPLSQL/source/
+                sqlplus / as sysdba @uninstall_all.sql UT3
+                sqlplus / as sysdba @install_headless.sql
+                """
+            }
+        }
+      
+        stage('Deploy PLSQL') {
+            steps {
+                sh """
+                export ORAENV_ASK=NO
+                export ORACLE_SID=pipedb
+                . oraenv
+                export ORACLE_SID=mydb_${BUILD_NUMBER}
+                cd $WORKSPACE
+                sqlplus demo2/demo2 @DEMO_BILL.pls
+                sqlplus demo2/demo2 @DEMO_BILL.plb
+                sqlplus demo2/demo2 @TEST_BILLING.pls
+                sqlplus demo2/demo2 @TEST_BILLING.plb
+
+                """
+            }
+        }
+
+      stage('Taking pre test boookmark') {
+            steps {
+                bookmark_db dbname: "mydb_${BUILD_NUMBER}", bookmarkname: "pre-mydb_${BUILD_NUMBER}"
+            }
+      }
+
+        stage('Run test DEMO_BILL') {
+            steps {
+                sh """        
+                /home/oracle/utPLSQL-cli/bin/utplsql run demo2/demo2@127.0.0.1/mydb_${BUILD_NUMBER}
+                sqlplus demo2/demo2@localhost/mydb_${BUILD_NUMBER} << EOF
+                select count(*) from demo_customer
+                EOF
+                """
+            }
+        }      
+
+      stage('Taking post test boookmark') {
+            steps {
+                bookmark_db dbname: "mydb_${BUILD_NUMBER}", bookmarkname: "post-mydb_${BUILD_NUMBER}"
+            }
+      }
+
+   }
+    post {
+        always {
+            finish_vdb dbname: "mydb_${BUILD_NUMBER}"
+        }
+    }
+}
