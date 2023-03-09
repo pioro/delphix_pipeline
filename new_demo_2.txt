@@ -81,7 +81,7 @@ pipeline {
                 export ORACLE_SID=pipedb
                 . oraenv
                 export ORACLE_SID=mydb_${BUILD_NUMBER}
-                cd $WORKSPACE
+                cd $WORKSPACE/code
                 sqlplus demo2/demo2 @DEMO_BILL.pls
                 sqlplus demo2/demo2 @DEMO_BILL.plb
                 sqlplus demo2/demo2 @TEST_BILLING.pls
@@ -105,7 +105,7 @@ pipeline {
                 export ORACLE_SID=pipedb
                 . oraenv
                 sqlplus demo2/demo2@localhost/mydb_${BUILD_NUMBER} << EOF
-                select count(*) from demo_customer
+                select count(*) from demo_customer;
                 EOF
                 """
             }
