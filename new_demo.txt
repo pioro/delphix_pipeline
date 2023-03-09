@@ -1,0 +1,120 @@
+pipeline {   
+
+    agent {
+       label 'oracle_target'
+    }
+
+    environment {
+        DLPX_ENGINE = "10.160.0.10"
+        DLPX_CRED = credentials('delphix_engine_credentials')
+        DLPX_USER = "$DLPX_CRED_USR"
+        DLPX_PASSWORD = "$DLPX_CRED_PSW"
+        DXTOOLKIT_CONF = "/config/dxtools.conf"
+    }
+
+    stages { 
+
+        stage('Prepare docker') {
+            steps {
+                sh """
+                sudo systemctl restart docker 
+                """
+            }
+        }
+        
+        stage('Configure Engine') {
+            steps {
+                engine()
+            }
+        }
+
+        stage('Start database') {
+            steps {
+                sh """
+                export JENKINS_NODE_COOKIE=dontKillMe 
+                /home/oracle/start_db19.sh 
+                """
+            }
+        }
+
+        stage('Discover Environment') {
+            steps {
+                add_environment name:"singlenode", host:"10.160.0.20"
+            }
+        }
+
+        stage('Create DSource') {
+            steps {
+                add_environment dbname:"db19", env:"singlenode"
+            }
+        }
+
+
+        stage('Provision  VDBs') {
+            steps {
+                prepare_vdb dbname: "golden_vdb", bookmarkname: "LATEST_SNAPSHOT"
+            }
+        }
+
+
+        stage('Prepare data catalog') {
+            stages {
+                stage('Prepare 10pctdata') {
+                    steps {
+                        sh """
+                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/pipedb << EOF
+                        create table demo_customer_new as select * from demo_customer sample(10);
+                        drop table demo_customer;
+                        rename demo_customer_new to demo_customer;
+                        EOF
+                        """.stripIndent()
+                    }   
+                }
+                stage('Prepare 10pctdata datacatalog entry') {
+                    steps {
+                        bookmark_db dbname: "golden_vdb", bookmarkname: "10pct"
+                    }
+                }
+                stage('Prepare 1pctdata') {
+                    steps {
+                        sh """
+                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/pipedb << EOF
+                        create table demo_customer_new as select * from demo_customer sample(10);
+                        drop table demo_customer;
+                        rename demo_customer_new to demo_customer;
+                        EOF
+                        """.stripIndent()
+                    }   
+                }
+                stage('Prepare 1pctdata datacatalog entry') {
+                    steps {
+                        bookmark_db dbname: "golden_vdb", bookmarkname: "1pct"
+                    }
+                }
+                stage('Prepare syntetic') {
+                    agent {
+                        label "oracle_target"
+                    }
+                    steps {
+                        sh """
+                        /home/oracle/sqlcl/bin/sql demo2/demo2@localhost/pipedb << EOF
+                        truncate table demo_customer;
+                        insert into demo_customer values (1, 'test sync 1', 'A', 'N');
+                        insert into demo_customer values (2, 'test sync 2', 'A', 'N');
+                        insert into demo_customer values (3, 'test sync 3', 'A', 'N');
+                        commit;
+                        EOF
+                        """.stripIndent()
+                    }   
+                }
+                stage('Prepare syntetic datacatalog entry') {
+                    steps {
+                        bookmark_db dbname: "golden_vdb", bookmarkname: "syntetic"
+                    }
+                }
+
+            }
+        }
+
+    }
+}
