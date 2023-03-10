@@ -1,6 +1,8 @@
 @Library('delphix_pipeline') _
 
 def BOOKMARKNAME=''
+def VDBNAME='mydb_'
+
 
 pipeline {
 
@@ -39,6 +41,7 @@ pipeline {
                 sh "echo ${testConfig}"
                 BOOKMARKNAME = testConfig["bookmarkName"]
                 echo BOOKMARKNAME
+                VDBNAME = testConfig["vdbName"]
             }
           }
       }
@@ -55,7 +58,7 @@ pipeline {
       
       stage('Prepare VDB') {
             steps {
-                prepare_vdb dbname: "mydb_${BUILD_NUMBER}", bookmarkname: "${BOOKMARKNAME}"
+                prepare_vdb dbname: "${VDBNAME}_${BUILD_NUMBER}", bookmarkname: "${BOOKMARKNAME}"
             }
       }
 
@@ -66,7 +69,7 @@ pipeline {
                 export ORAENV_ASK=NO
                 export ORACLE_SID=pipedb
                 . oraenv
-                export ORACLE_SID=mydb_${BUILD_NUMBER}
+                export ORACLE_SID=${VDBNAME}_${BUILD_NUMBER}
                 cd /home/oracle/utPLSQL/source/
                 sqlplus / as sysdba @uninstall_all.sql UT3
                 sqlplus / as sysdba @install_headless.sql
@@ -80,7 +83,7 @@ pipeline {
                 export ORAENV_ASK=NO
                 export ORACLE_SID=pipedb
                 . oraenv
-                export ORACLE_SID=mydb_${BUILD_NUMBER}
+                export ORACLE_SID=${VDBNAME}_${BUILD_NUMBER}
                 cd $WORKSPACE/code
                 sqlplus demo2/demo2 @DEMO_BILL.pls
                 sqlplus demo2/demo2 @DEMO_BILL.plb
@@ -93,18 +96,18 @@ pipeline {
 
       stage('Taking pre test boookmark') {
             steps {
-                bookmark_db dbname: "mydb_${BUILD_NUMBER}", bookmarkname: "pre-mydb_${BUILD_NUMBER}"
+                bookmark_db dbname: "${VDBNAME}_${BUILD_NUMBER}", bookmarkname: "pre-${VDBNAME}_${BUILD_NUMBER}"
             }
       }
 
         stage('Run test DEMO_BILL') {
             steps {
                 sh """        
-                /home/oracle/utPLSQL-cli/bin/utplsql run demo2/demo2@127.0.0.1/mydb_${BUILD_NUMBER}
+                /home/oracle/utPLSQL-cli/bin/utplsql run demo2/demo2@127.0.0.1/${VDBNAME}_${BUILD_NUMBER}
                 export ORAENV_ASK=NO
                 export ORACLE_SID=pipedb
                 . oraenv
-                sqlplus demo2/demo2@localhost/mydb_${BUILD_NUMBER} << EOF
+                sqlplus demo2/demo2@localhost/${VDBNAME}_${BUILD_NUMBER} << EOF
                 select count(*) from demo_customer;
                 EOF
                 """
@@ -113,14 +116,14 @@ pipeline {
 
       stage('Taking post test boookmark') {
             steps {
-                bookmark_db dbname: "mydb_${BUILD_NUMBER}", bookmarkname: "post-mydb_${BUILD_NUMBER}"
+                bookmark_db dbname: "${VDBNAME}_${BUILD_NUMBER}", bookmarkname: "post-${VDBNAME}_${BUILD_NUMBER}"
             }
       }
 
    }
     post {
         always {
-            finish_vdb dbname: "mydb_${BUILD_NUMBER}"
+            finish_vdb dbname: "${VDBNAME}_${BUILD_NUMBER}"
         }
     }
 }
